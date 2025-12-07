@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 // Heredamos de la clase Enemigobase
 public class MonstruoBasura : EnemigoBase
@@ -18,15 +17,8 @@ public class MonstruoBasura : EnemigoBase
 
             if (distancia < distanciaAtaque)
             {
-                Atacar();
+                Atacar(); // Usa una funcion heredada de padre
             }
         }
-    }
-
-    void Atacar()
-    {
-        Debug.Log("¡Te atrapó la basura!");
-        // Reinicia el nivel (Game Over simple)
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

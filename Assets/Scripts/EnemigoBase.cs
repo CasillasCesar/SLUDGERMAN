@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;   // No lo olvides, no seas tonoto
+using UnityEngine.SceneManagement;
 
 public class EnemigoBase : MonoBehaviour
 {
@@ -29,5 +30,12 @@ public class EnemigoBase : MonoBehaviour
         {
             agente.SetDestination(jugador.position);
         }
+    }
+
+    // Se reutiliza la funcion de atacar para todos los enemigos
+    public virtual void Atacar()
+    {
+        Debug.Log("¡Te atrapó un enemigo!");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
