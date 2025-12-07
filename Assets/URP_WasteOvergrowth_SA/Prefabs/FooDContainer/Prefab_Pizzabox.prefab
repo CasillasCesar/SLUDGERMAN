@@ -9,8 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3340311267447010733}
-  - component: {fileID: 4135720672810982599}
-  - component: {fileID: 9062391415411580455}
   m_Layer: 0
   m_Name: Prefab_Pizzabox
   m_TagString: Untagged
@@ -34,42 +32,6 @@ Transform:
   - {fileID: 4341812119048432410}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!195 &4135720672810982599
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 22648899321674013}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.2
-  m_Speed: 3.5
-  m_Acceleration: 100
-  avoidancePriority: 50
-  m_AngularSpeed: 300
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 0.1
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 1
---- !u!114 &9062391415411580455
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 22648899321674013}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fc95c38d060892409783905e7f82634, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MonstruoCajaPizza
-  velocidad: 3.5
-  distanciaAtaque: 1.5
 --- !u!1001 &4308694025233452273
 PrefabInstance:
   m_ObjectHideFlags: 0
