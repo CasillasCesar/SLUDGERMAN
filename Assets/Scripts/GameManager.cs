@@ -14,7 +14,10 @@ public class GameManager : MonoBehaviour
     public GameObject jugador;
 
     public int basuraActual = 0;
-    public TextMeshProUGUI textoUI; // Arrastra tu texto aquí
+
+    [Header("HUD")]
+    public TextMeshProUGUI textoScore; // Arrastra tu texto aquí
+    public TextMeshProUGUI textoMensaje;
 
     void Awake()
     {
@@ -23,7 +26,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        ActualizarUI(); 
+        ActualizarUI();
         if (puntoRespawnActual == null)
             Debug.LogWarning("¡Asigna el Respawn Inicial en el Inspector!");
     }
@@ -46,17 +49,25 @@ public class GameManager : MonoBehaviour
         {
             Destroy(muroBloqueo); // ¡Adiós muro!
 
+            // Usamos el nuevo texto central
+            if (textoMensaje != null)
+            {
+                textoMensaje.text = "¡ZONA DESBLOQUEADA!";
+                // Truco: Borrar el mensaje después de 3 segundos
+                Invoke("BorrarMensaje", 3f);
+            }
+
             // Mensaje de feedback
-            if (textoUI != null) textoUI.text = "¡ZONA DESBLOQUEADA!\nCORRE...";
+            if (textoScore != null) textoScore.text = "¡ZONA DESBLOQUEADA!\nCORRE...";
             Debug.Log("Muro destruido, avanza a la siguiente zona.");
         }
     }
 
-    void ActualizarUI()
-    {
-        if (textoUI != null)
-            textoUI.text = $"Basura: {basuraActual} / {basuraObjetivo}";
-    }
+    //void ActualizarUI()
+    //{
+    //    if (textoScore != null)
+    //        textoScore.text = $"Basura: {basuraActual} / {basuraObjetivo}";
+    //}
 
     public void RespawnJugador()
     {
@@ -76,5 +87,17 @@ public class GameManager : MonoBehaviour
         {
             enemigo.ResetearPosicion();
         }
+    }
+
+    void BorrarMensaje()
+    {
+        if (textoMensaje != null) textoMensaje.text = "";
+    }
+
+    void ActualizarUI()
+    {
+        // Actualizamos solo el score
+        if (textoScore != null)
+            textoScore.text = $"Basura: {basuraActual} / {basuraObjetivo}";
     }
 }
