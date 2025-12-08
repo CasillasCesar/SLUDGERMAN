@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3340311267447010733}
+  - component: {fileID: 6398267278363529846}
   m_Layer: 0
   m_Name: Prefab_Pizzabox
   m_TagString: Pick
@@ -32,6 +33,27 @@ Transform:
   - {fileID: 4341812119048432410}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &6398267278363529846
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 22648899321674013}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.6119559, y: 0.26630333, z: 0.67391264}
+  m_Center: {x: 0.0016304255, y: 0.12554367, z: -0.016304359}
 --- !u!1001 &4308694025233452273
 PrefabInstance:
   m_ObjectHideFlags: 0
