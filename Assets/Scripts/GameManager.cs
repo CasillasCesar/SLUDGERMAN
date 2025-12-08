@@ -9,6 +9,10 @@ public class GameManager : MonoBehaviour
     public int basuraObjetivo = 5;
     public GameObject muroBloqueo; // El muro que impide pasar a la siguiente zona
 
+    [Header("Sistema de Respawn")]
+    public Transform puntoRespawnActual;
+    public GameObject jugador;
+
     public int basuraActual = 0;
     public TextMeshProUGUI textoUI; // Arrastra tu texto aquí
 
@@ -19,7 +23,9 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        ActualizarUI();
+        ActualizarUI(); 
+        if (puntoRespawnActual == null)
+            Debug.LogWarning("¡Asigna el Respawn Inicial en el Inspector!");
     }
 
     public void RecolectarBasura()
@@ -50,5 +56,25 @@ public class GameManager : MonoBehaviour
     {
         if (textoUI != null)
             textoUI.text = $"Basura: {basuraActual} / {basuraObjetivo}";
+    }
+
+    public void RespawnJugador()
+    {
+        Debug.Log("El jugador murió - RESPAWEN");
+        // Se desactiva para evitar errores por fisicas
+        jugador.SetActive(false);
+        // Mover al punto guardado
+        jugador.transform.position = puntoRespawnActual.position;
+        jugador.transform.rotation = puntoRespawnActual.rotation;
+
+        jugador.SetActive(true);
+
+        // Buscamos todos los enemigos que estén activos en la escena y los regresamos a su punto de origen
+        EnemigoBase[] enemigosActivos = FindObjectsOfType<EnemigoBase>();
+
+        foreach (EnemigoBase enemigo in enemigosActivos)
+        {
+            enemigo.ResetearPosicion();
+        }
     }
 }

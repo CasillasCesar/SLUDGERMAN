@@ -12,6 +12,9 @@ public class CheckpointZona : MonoBehaviour
     public int nuevaMetaBasura = 5;
     public GameObject siguienteMuro;
 
+    [Header("Respawn")]
+    public Transform nuevoPuntoRespawn;
+
     private bool activado = false;
 
     private void OnTriggerEnter(Collider other)
@@ -26,7 +29,7 @@ public class CheckpointZona : MonoBehaviour
             {
                 jefeDeEstaZona.SetActive(true);
 
-                if (jefePasado)
+                if (jefePasado && jefePasado.activeSelf)
                 {
                     jefePasado.SetActive(false);
                 }
@@ -36,6 +39,19 @@ public class CheckpointZona : MonoBehaviour
             GameManager.instancia.basuraObjetivo = nuevaMetaBasura;
             GameManager.instancia.muroBloqueo = siguienteMuro;
             // Resetear contador interno (opcional, o acumularlo)
+
+            // 2. Actualizar GameManager
+            if (GameManager.instancia != null)
+            {
+                GameManager.instancia.basuraObjetivo = nuevaMetaBasura;
+                GameManager.instancia.muroBloqueo = siguienteMuro;
+
+                // ACTUALIZAR EL RESPAWN y el jefe
+                if (nuevoPuntoRespawn != null)
+                {
+                    GameManager.instancia.puntoRespawnActual = nuevoPuntoRespawn;
+                }
+            }
 
             // 3. Destruirse para no activarse doble
             Destroy(gameObject);

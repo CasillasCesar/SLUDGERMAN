@@ -9,11 +9,18 @@ public class EnemigoBase : MonoBehaviour
     protected Transform jugador; // Referencia al Jugador
 
     public float velocidad = 3.5f;
+
+    // --- NUEVO: Variable para guardar dónde empezó ---
+    private Vector3 posicionInicial;
+
     // "virtual" para poder hacer override al metodo
     public virtual void Start()
     {
         agente = GetComponent<NavMeshAgent>();
         agente.speed = velocidad;
+
+        // --- NUEVO: Guardamos la posición inicial al arrancar ---
+        posicionInicial = transform.position;
 
         // Buscar automaticamente al jugador
         GameObject objJugador = GameObject.FindGameObjectWithTag("Player");
@@ -36,6 +43,17 @@ public class EnemigoBase : MonoBehaviour
     public virtual void Atacar()
     {
         Debug.Log("¡Te atrapó un enemigo!");
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        if (GameManager.instancia != null)
+        {
+            GameManager.instancia.RespawnJugador();
+        }
+    }
+
+    // --- NUEVA FUNCIÓN: Para mandarlo a su casa ---
+    public void ResetearPosicion()
+    {
+        // Warp es la forma segura de teletransportar un NavMeshAgent
+        agente.Warp(posicionInicial);
     }
 }
