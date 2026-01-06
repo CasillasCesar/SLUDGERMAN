@@ -3,8 +3,12 @@ using UnityEngine.AI;
 
 public class GeneradorBasura : MonoBehaviour
 {
+
+    [Header("Configuración")]
+    public bool generarAlInicio = true;
+
     public GameObject[] prefabsBasura;
-    public int cantidadAGenerar = 10;
+    public int cantidadAGenerar = 5;
     public Vector3 areaTamano = new Vector3(10, 1, 10);
 
     [Header("Filtros de Spawn")]
@@ -14,10 +18,14 @@ public class GeneradorBasura : MonoBehaviour
 
     void Start()
     {
-        Generar();
+        // Solo si la casilla está marcada, genera automático (Ideal para Zona 1)
+        if (generarAlInicio)
+        {
+            Generar();
+        }
     }
 
-    void Generar()
+    public void Generar()
     {
         int intentosFallidos = 0; // Seguridad para no congelar Unity
         int i = 0;
@@ -76,7 +84,7 @@ public class GeneradorBasura : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.yellow;
+        Gizmos.color = generarAlInicio ? Color.yellow : Color.red; // Amarillo=Auto, Rojo=Espera
         Gizmos.DrawWireCube(transform.position, areaTamano);
     }
 }

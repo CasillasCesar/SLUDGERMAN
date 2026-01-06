@@ -11,6 +11,7 @@ public class CheckpointZona : MonoBehaviour
     [Header("Configuración Nueva Zona")]
     public int nuevaMetaBasura = 5;
     public GameObject siguienteMuro;
+    public GeneradorBasura spawnerDeEstaZona; 
 
     [Header("Respawn")]
     public Transform nuevoPuntoRespawn;
@@ -34,17 +35,15 @@ public class CheckpointZona : MonoBehaviour
                     jefePasado.SetActive(false);
                 }
             }
-
-            // 2. Reiniciar el GameManager para la nueva misión
-            GameManager.instancia.basuraObjetivo = nuevaMetaBasura;
-            GameManager.instancia.muroBloqueo = siguienteMuro;
-            // Resetear contador interno (opcional, o acumularlo)
+            if (spawnerDeEstaZona != null)
+            {
+                spawnerDeEstaZona.Generar(); // <--- ¡Esta línea hace la magia!
+            }
 
             // 2. Actualizar GameManager
             if (GameManager.instancia != null)
             {
-                GameManager.instancia.basuraObjetivo = nuevaMetaBasura;
-                GameManager.instancia.muroBloqueo = siguienteMuro;
+                GameManager.instancia.IniciarNuevaZona(nuevaMetaBasura, siguienteMuro);
 
                 // ACTUALIZAR EL RESPAWN y el jefe
                 if (nuevoPuntoRespawn != null)

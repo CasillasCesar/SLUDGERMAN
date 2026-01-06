@@ -100,4 +100,13 @@ public class GameManager : MonoBehaviour
         if (textoScore != null)
             textoScore.text = $"Basura: {basuraActual} / {basuraObjetivo}";
     }
+
+    public void IniciarNuevaZona(int nuevaMeta, GameObject nuevoMuro)
+    {
+        basuraActual = 0;
+        basuraObjetivo = nuevaMeta;
+        muroBloqueo = nuevoMuro;
+
+        ActualizarUI();
+    }
 }
