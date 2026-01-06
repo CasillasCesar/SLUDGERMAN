@@ -71251,6 +71251,10 @@ PrefabInstance:
       propertyPath: generarAlInicio
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5278818798817546497, guid: aba41b964e52a4f4693474a4d4554075, type: 3}
+      propertyPath: cantidadAGenerar
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 8131993607591102260, guid: aba41b964e52a4f4693474a4d4554075, type: 3}
       propertyPath: m_Name
       value: Spawner_Zona2
