@@ -2,16 +2,18 @@ using UnityEngine;
 
 public class CheckpointZona : MonoBehaviour
 {
-    [Header("¿Hay algún enemigo que eliminar?")]
+    [Header("Jefes")]
     public GameObject jefePasado;
-
-    [Header("¿A quién despertamos?")]
     public GameObject jefeDeEstaZona;
 
     [Header("Configuración Nueva Zona")]
     public int nuevaMetaBasura = 5;
     public GameObject siguienteMuro;
-    public GeneradorBasura spawnerDeEstaZona; 
+    public GeneradorBasura spawnerDeEstaZona;
+
+    [Header("Temporizador")]
+    public bool activarTiempoAqui = false; // Marcalo SOLO si empieza el Nivel 2
+    public float tiempoParaEstaZona = 90f; // Segundos (ej. 1 minuto y medio)
 
     [Header("Respawn")]
     public Transform nuevoPuntoRespawn;
@@ -23,36 +25,30 @@ public class CheckpointZona : MonoBehaviour
         if (other.CompareTag("Player") && !activado)
         {
             activado = true;
-            Debug.Log("¡Entrando a Zona Peligrosa!");
+            Debug.Log("Checkpoint alcanzado.");
 
-            // 1. Activar al Jefe
-            if (jefeDeEstaZona != null)
-            {
-                jefeDeEstaZona.SetActive(true);
+            // 1. Enemigos y Basura
+            if (jefeDeEstaZona != null) jefeDeEstaZona.SetActive(true);
+            if (jefePasado != null) jefePasado.SetActive(false);
+            if (spawnerDeEstaZona != null) spawnerDeEstaZona.Generar();
 
-                if (jefePasado && jefePasado.activeSelf)
-                {
-                    jefePasado.SetActive(false);
-                }
-            }
-            if (spawnerDeEstaZona != null)
-            {
-                spawnerDeEstaZona.Generar(); // <--- ¡Esta línea hace la magia!
-            }
-
-            // 2. Actualizar GameManager
+            // 2. Avisar al GameManager (CON LOS NUEVOS DATOS DE TIEMPO)
             if (GameManager.instancia != null)
             {
-                GameManager.instancia.IniciarNuevaZona(nuevaMetaBasura, siguienteMuro);
+                // Esta es la línea que te estaba dando error
+                GameManager.instancia.IniciarNuevaZona(
+                    nuevaMetaBasura,
+                    siguienteMuro,
+                    activarTiempoAqui,
+                    tiempoParaEstaZona
+                );
 
-                // ACTUALIZAR EL RESPAWN y el jefe
                 if (nuevoPuntoRespawn != null)
                 {
                     GameManager.instancia.puntoRespawnActual = nuevoPuntoRespawn;
                 }
             }
 
-            // 3. Destruirse para no activarse doble
             Destroy(gameObject);
         }
     }
