@@ -15,8 +15,6 @@ public class SistemaPasos : MonoBehaviour
     private Vector3 ultimaPosicion;
     private float cronometro;
 
-    public AudioClip sonidoRecoger;
-
     void Start()
     {
         if (fuenteAudio == null) fuenteAudio = GetComponent<AudioSource>();
