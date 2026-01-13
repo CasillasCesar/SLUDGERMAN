@@ -73,14 +73,17 @@ public class EnemigoBase : MonoBehaviour
         }
 
         // Enfriamiento
-        this.enabled = false;
-        Invoke("Reactivar", 2.0f);
+        if (agente != null) agente.isStopped = true; // Frena el movimiento del NavMesh
+        this.enabled = false; // Apaga el cerebro del enemigo (Update)
+
+        Invoke("Reactivar", 2.0f); // Se queda quieto 2 segundos
     }
 
     // Función auxiliar para volver a activar el script
     void Reactivar()
     {
-        this.enabled = true;
+        this.enabled = true; // Prende el cerebro
+        if (agente != null) agente.isStopped = false; // Vuelve a caminar
     }
 
     // Para mandarlo a su casa (Tu función original intacta)

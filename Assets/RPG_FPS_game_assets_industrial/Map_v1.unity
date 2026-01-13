@@ -20324,7 +20324,7 @@ PrefabInstance:
       objectReference: {fileID: 1777067791}
     - target: {fileID: 677231903267033567, guid: 6f1a23c5f24c46440972b1a771abe90a, type: 3}
       propertyPath: tiempoParaEstaZona
-      value: 150
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 1778742024156044244, guid: 6f1a23c5f24c46440972b1a771abe90a, type: 3}
       propertyPath: m_LocalScale.x
@@ -20332,7 +20332,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1778742024156044244, guid: 6f1a23c5f24c46440972b1a771abe90a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -22.642855
+      value: -23
       objectReference: {fileID: 0}
     - target: {fileID: 1778742024156044244, guid: 6f1a23c5f24c46440972b1a771abe90a, type: 3}
       propertyPath: m_LocalPosition.y
@@ -20340,7 +20340,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1778742024156044244, guid: 6f1a23c5f24c46440972b1a771abe90a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 5.0935836
+      value: -14
       objectReference: {fileID: 0}
     - target: {fileID: 1778742024156044244, guid: 6f1a23c5f24c46440972b1a771abe90a, type: 3}
       propertyPath: m_LocalRotation.w
@@ -50389,7 +50389,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1201367550}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1753365363}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ReiniciarDesdeCheckpoint
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: ReiniciarNivel
+          m_BoolArgument: 0
+        m_CallState: 1
 --- !u!114 &1201367550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -73866,7 +73878,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4568429669435945804, guid: aba41b964e52a4f4693474a4d4554075, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 66.1
+      value: 34
       objectReference: {fileID: 0}
     - target: {fileID: 4568429669435945804, guid: aba41b964e52a4f4693474a4d4554075, type: 3}
       propertyPath: m_LocalPosition.y
@@ -73874,7 +73886,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4568429669435945804, guid: aba41b964e52a4f4693474a4d4554075, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 29
+      value: 31
       objectReference: {fileID: 0}
     - target: {fileID: 4568429669435945804, guid: aba41b964e52a4f4693474a4d4554075, type: 3}
       propertyPath: m_LocalRotation.w
@@ -73910,7 +73922,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5278818798817546497, guid: aba41b964e52a4f4693474a4d4554075, type: 3}
       propertyPath: areaTamano.x
-      value: 150
+      value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 5278818798817546497, guid: aba41b964e52a4f4693474a4d4554075, type: 3}
       propertyPath: areaTamano.y
@@ -73918,7 +73930,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5278818798817546497, guid: aba41b964e52a4f4693474a4d4554075, type: 3}
       propertyPath: areaTamano.z
-      value: 120
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5278818798817546497, guid: aba41b964e52a4f4693474a4d4554075, type: 3}
       propertyPath: generarAlInicio

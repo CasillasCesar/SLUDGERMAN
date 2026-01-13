@@ -32,7 +32,9 @@ public class GameManager : MonoBehaviour
     private bool cuentaRegresivaActiva = false;
     private bool juegoTerminado = false;
 
-    // --- NUEVO: CANDADO PARA EVITAR GANAR POR ERROR ---
+    // MEMORIA
+    private float tiempoInicialDeZona = 0f;
+    private GeneradorBasura spawnerActual;
     private bool zonaYaDesbloqueada = false;
 
     void Awake()
@@ -55,10 +57,12 @@ public class GameManager : MonoBehaviour
     {
         if (juegoTerminado) return;
 
-        // Temporizador
         if (cuentaRegresivaActiva)
         {
             tiempoRestante -= Time.deltaTime;
+
+            if (tiempoRestante < 0) tiempoRestante = 0;
+
             int minutos = Mathf.FloorToInt(tiempoRestante / 60);
             int segundos = Mathf.FloorToInt(tiempoRestante % 60);
 
@@ -86,10 +90,9 @@ public class GameManager : MonoBehaviour
         }
 
         if (vidasActuales <= 0) GameOver();
-        else RespawnJugador();
+        else Debug.Log("Sigues vivo");
     }
 
-    // --- AQUÍ ESTÁ EL ARREGLO ---
     public void RecolectarBasura()
     {
         if (juegoTerminado) return;
@@ -97,27 +100,32 @@ public class GameManager : MonoBehaviour
         basuraActual++;
         ActualizarUI();
 
-        // Solo intentamos desbloquear SI NO lo hemos hecho ya
         if (basuraActual >= basuraObjetivo && !zonaYaDesbloqueada)
         {
             DesbloquearZona();
         }
     }
 
-    // --- TRANSICIÓN DE ZONAS ---
-    public void IniciarNuevaZona(int nuevaMeta, GameObject nuevoMuro, bool activarTiempo, float tiempoZona)
+    public void IniciarNuevaZona(int nuevaMeta, GameObject nuevoMuro, bool activarTiempo, float tiempoZona, GeneradorBasura spawner)
     {
         basuraActual = 0;
         basuraObjetivo = nuevaMeta;
         muroBloqueo = nuevoMuro;
+        spawnerActual = spawner;
 
-        // --- IMPORTANTE: Reseteamos el candado para la nueva zona ---
         zonaYaDesbloqueada = false;
 
         if (activarTiempo)
         {
             tiempoRestante = tiempoZona;
+            tiempoInicialDeZona = tiempoZona;
             cuentaRegresivaActiva = true;
+        }
+        else
+        {
+            tiempoInicialDeZona = 0;
+            cuentaRegresivaActiva = false;
+            if (textoTiempo) textoTiempo.text = "";
         }
 
         ActualizarUI();
@@ -125,12 +133,14 @@ public class GameManager : MonoBehaviour
 
     void DesbloquearZona()
     {
-        // Ponemos el candado para que la basura extra no vuelva a activar esto
         zonaYaDesbloqueada = true;
+
+        // --- CAMBIO AQUÍ: QUITAMOS LA PAUSA DEL RELOJ ---
+        // cuentaRegresivaActiva = false; (Línea borrada para que el tiempo siga corriendo)
 
         if (muroBloqueo != null)
         {
-            Destroy(muroBloqueo);
+            muroBloqueo.SetActive(false); // Ocultar muro
 
             if (textoMensaje != null)
             {
@@ -141,12 +151,11 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            // Solo ganamos si NO hay muro Y acabamos de cumplir la meta
+            // Solo si ganamos el juego completo detenemos el tiempo
             Victoria();
         }
     }
 
-    // --- FUNCIONES DE ESTADO ---
     public void RespawnJugador()
     {
         jugador.SetActive(false);
@@ -161,23 +170,22 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         juegoTerminado = true;
-        cuentaRegresivaActiva = false;
-        CongelarJugador(); // Función nueva para limpiar código
+        cuentaRegresivaActiva = false; // Aquí SI se detiene
+        CongelarJugador();
 
         if (panelGameOver) panelGameOver.SetActive(true);
-        if (textoMensaje) textoMensaje.text = "";
+        if (textoMensaje) textoMensaje.text = "¡FIN DEL JUEGO!";
     }
 
     public void Victoria()
     {
         juegoTerminado = true;
-        cuentaRegresivaActiva = false;
-        CongelarJugador(); // Función nueva para limpiar código
+        cuentaRegresivaActiva = false; // Aquí SI se detiene
+        CongelarJugador();
 
         if (panelVictoria) panelVictoria.SetActive(true);
     }
 
-    // --- AUXILIAR PARA DETENER TODO ---
     void CongelarJugador()
     {
         Cursor.lockState = CursorLockMode.None;
@@ -187,10 +195,8 @@ public class GameManager : MonoBehaviour
         {
             var movimiento = jugador.GetComponent<MovimientoSimple>();
             if (movimiento != null) movimiento.enabled = false;
-
             var pasos = jugador.GetComponent<SistemaPasos>();
             if (pasos != null) pasos.enabled = false;
-
             var interaccion = jugador.GetComponent<InteraccionJugador>();
             if (interaccion != null) interaccion.enabled = false;
         }
@@ -200,4 +206,64 @@ public class GameManager : MonoBehaviour
     public void SalirAlMenu() { SceneManager.LoadScene(0); }
     void BorrarMensaje() { if (textoMensaje != null) textoMensaje.text = ""; }
     void ActualizarUI() { if (textoScore != null) textoScore.text = $"Basura: {basuraActual} / {basuraObjetivo}"; }
+
+    public void ReiniciarDesdeCheckpoint()
+    {
+        Debug.Log("Reviviendo...");
+
+        juegoTerminado = false;
+        vidasActuales = vidasMaximas;
+        basuraActual = 0;
+
+        if (textoMensaje != null) textoMensaje.text = "";
+
+        ActualizarUI();
+
+        if (spawnerActual != null)
+        {
+            spawnerActual.ResetearSistema();
+        }
+
+        if (muroBloqueo != null)
+        {
+            muroBloqueo.SetActive(true);
+            zonaYaDesbloqueada = false;
+        }
+
+        if (tiempoInicialDeZona > 0)
+        {
+            tiempoRestante = tiempoInicialDeZona;
+            cuentaRegresivaActiva = true;
+        }
+        else
+        {
+            cuentaRegresivaActiva = false;
+            if (textoTiempo) textoTiempo.text = "";
+        }
+
+        if (panelGameOver) panelGameOver.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        if (jugador != null)
+        {
+            var movimiento = jugador.GetComponent<MovimientoSimple>();
+            if (movimiento != null) movimiento.enabled = true;
+            var pasos = jugador.GetComponent<SistemaPasos>();
+            if (pasos != null) pasos.enabled = true;
+            var interaccion = jugador.GetComponent<InteraccionJugador>();
+            if (interaccion != null) interaccion.enabled = true;
+        }
+
+        ActualizarCorazonesUI();
+        RespawnJugador();
+    }
+
+    void ActualizarCorazonesUI()
+    {
+        for (int i = 0; i < corazones.Length; i++)
+        {
+            corazones[i].SetActive(true);
+        }
+    }
 }

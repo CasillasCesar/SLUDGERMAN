@@ -3,7 +3,6 @@ using UnityEngine.AI;
 
 public class GeneradorBasura : MonoBehaviour
 {
-
     [Header("Configuración")]
     public bool generarAlInicio = true;
 
@@ -13,12 +12,11 @@ public class GeneradorBasura : MonoBehaviour
 
     [Header("Filtros de Spawn")]
     public float radioBusqueda = 2.0f;
-    public float alturaMaximaPermitida = 1.5f; // <--- NUEVO: Si Y es mayor a esto, no spawnea
-    public LayerMask capasAEvitar; // <--- NUEVO: Capas que bloquean el spawn (Paredes, Cajas)
+    public float alturaMaximaPermitida = 1.5f;
+    public LayerMask capasAEvitar;
 
     void Start()
     {
-        // Solo si la casilla está marcada, genera automático (Ideal para Zona 1)
         if (generarAlInicio)
         {
             Generar();
@@ -27,7 +25,7 @@ public class GeneradorBasura : MonoBehaviour
 
     public void Generar()
     {
-        int intentosFallidos = 0; // Seguridad para no congelar Unity
+        int intentosFallidos = 0;
         int i = 0;
 
         while (i < cantidadAGenerar && intentosFallidos < 100)
@@ -40,51 +38,53 @@ public class GeneradorBasura : MonoBehaviour
 
             NavMeshHit hit;
 
-            // 1. Preguntamos al NavMesh
             if (NavMesh.SamplePosition(puntoAleatorio, out hit, radioBusqueda, NavMesh.AllAreas))
             {
                 bool posicionValida = true;
 
-                // --- FILTRO 1: ALTURA (Evitar Techos) ---
-                if (hit.position.y > transform.position.y + alturaMaximaPermitida)
-                {
-                    posicionValida = false;
-                }
+                if (hit.position.y > transform.position.y + alturaMaximaPermitida) posicionValida = false;
+                if (Physics.CheckSphere(hit.position + Vector3.up * 0.5f, 0.3f, capasAEvitar)) posicionValida = false;
 
-                // --- FILTRO 2: ESPACIO LIBRE (Evitar aparecer dentro de cosas) ---
-                if (Physics.CheckSphere(hit.position + Vector3.up * 0.5f, 0.3f, capasAEvitar))
-                {
-                    posicionValida = false;
-                }
-
-                // --- RESULTADO ---
                 if (posicionValida)
                 {
                     Quaternion rotacionAleatoria = Quaternion.Euler(0, Random.Range(0, 360), 0);
                     int indicePrefab = Random.Range(0, prefabsBasura.Length);
-                    // Al quitar 'transform', la basura se crea suelta en la escena y NO se deforma
-                    GameObject basura = Instantiate(prefabsBasura[indicePrefab], hit.position, rotacionAleatoria);
 
+                    GameObject basura = Instantiate(prefabsBasura[indicePrefab], hit.position, rotacionAleatoria);
                     basura.transform.SetParent(null);
-                    i++; // Éxito, pasamos a la siguiente basura
+
+                    // IMPORTANTE: Asegúrate de que tus prefabs tengan el Tag "Pick"
+                    // para que el sistema los encuentre al limpiar.
+
+                    i++;
                 }
-                else
-                {
-                    intentosFallidos++; // Falló el filtro, intentamos de nuevo
-                }
+                else intentosFallidos++;
             }
-            else
-            {
-                intentosFallidos++; // No encontró NavMesh
-            }
+            else intentosFallidos++;
         }
 
         if (intentosFallidos >= 100) Debug.LogWarning("El Generador batalló para encontrar lugares válidos.");
     }
 
+    // --- ESTA ES LA FUNCIÓN QUE USARÁ EL GAMEMANAGER AL MORIR ---
+    public void ResetearSistema()
+    {
+        // 1. Buscamos TODA la basura que exista en la escena
+        // Como la del futuro no existe, no hay riesgo.
+        GameObject[] basuraExistente = GameObject.FindGameObjectsWithTag("Pick");
+
+        foreach (GameObject b in basuraExistente)
+        {
+            Destroy(b);
+        }
+
+        // 2. Generamos nueva basura fresca
+        Generar();
+    }
+
     void OnDrawGizmosSelected()
     {
-        Gizmos.color = generarAlInicio ? Color.yellow : Color.red; // Amarillo=Auto, Rojo=Espera
+        Gizmos.color = generarAlInicio ? Color.yellow : Color.red;
         Gizmos.DrawWireCube(transform.position, areaTamano);
     }
 }

@@ -15,7 +15,7 @@ public class InteraccionJugador : MonoBehaviour
     public Color colorNormal = Color.white;
     public Color colorInteraccion = Color.red; // Se pone rojo al mirar basura
 
-    void Update()
+    void LateUpdate()
     {
         RaycastHit hit;
         // Lanzamos el rayo CONSTANTEMENTE para ver qué miramos
