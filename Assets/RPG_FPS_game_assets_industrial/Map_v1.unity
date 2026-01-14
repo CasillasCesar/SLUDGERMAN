@@ -45999,7 +45999,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76e2ff2facbe3f94d965eebaa8a2566f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimientoSimple
-  velocidad: 50
+  velocidad: 7
   sensibilidadMouse: 2
 --- !u!54 &1090182334
 Rigidbody:
