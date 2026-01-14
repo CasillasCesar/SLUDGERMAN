@@ -266,4 +266,44 @@ public class GameManager : MonoBehaviour
             corazones[i].SetActive(true);
         }
     }
+
+    public void IniciarModoEscape(float tiempoEscape, Transform nuevoRespawn)
+    {
+        Debug.Log("¡MODO ESCAPE ACTIVADO!");
+
+        // 1. Limpiar rastro del nivel anterior
+        // Si había un muro activo, lo apagamos para que no estorbe al regresar
+        if (muroBloqueo != null)
+        {
+            muroBloqueo.SetActive(false);
+        }
+
+        // Vaciamos las variables para que al morir NO intente poner muro ni basura
+        muroBloqueo = null;
+        spawnerActual = null;
+
+        basuraActual = 0;
+        basuraObjetivo = 0; // Ya no hay que juntar nada
+        zonaYaDesbloqueada = true; // Para que no intente desbloquear nada
+
+        // 2. Configurar el Nuevo Tiempo
+        if (tiempoEscape > 0)
+        {
+            tiempoInicialDeZona = tiempoEscape; // Guardamos el tiempo de escape (ej. 120s)
+            tiempoRestante = tiempoEscape;
+            cuentaRegresivaActiva = true;
+        }
+        else
+        {
+            cuentaRegresivaActiva = false;
+        }
+
+        // 3. Actualizar Respawn
+        if (nuevoRespawn != null)
+        {
+            puntoRespawnActual = nuevoRespawn;
+        }
+
+        ActualizarUI();
+    }
 }
