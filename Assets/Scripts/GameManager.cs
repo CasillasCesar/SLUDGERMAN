@@ -23,14 +23,18 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI textoMensaje;
     public TextMeshProUGUI textoTiempo;
     public GameObject[] corazones;
+
+    [Header("Paneles UI")]
     public GameObject panelGameOver;
     public GameObject panelVictoria;
+    public GameObject panelPausa; // <--- NUEVO: Arrastra aquí tu panel de pausa
 
     // Variables Internas
     private int vidasActuales;
     private float tiempoRestante = 60f;
     private bool cuentaRegresivaActiva = false;
     private bool juegoTerminado = false;
+    private bool juegoPausado = false; // <--- NUEVO: Control de pausa
 
     // MEMORIA
     private float tiempoInicialDeZona = 0f;
@@ -46,8 +50,11 @@ public class GameManager : MonoBehaviour
     {
         vidasActuales = vidasMaximas;
 
+        // Aseguramos que los paneles estorben al inicio
         if (panelGameOver) panelGameOver.SetActive(false);
         if (panelVictoria) panelVictoria.SetActive(false);
+        if (panelPausa) panelPausa.SetActive(false); // <--- NUEVO
+
         if (textoTiempo) textoTiempo.text = "";
 
         ActualizarUI();
@@ -55,7 +62,14 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (juegoTerminado) return;
+        // --- NUEVO: SISTEMA DE PAUSA ---
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
+        {
+            TogglePausa();
+        }
+
+        if (juegoTerminado || juegoPausado) return; // Si está pausado, no corre el tiempo
+        // -------------------------------
 
         if (cuentaRegresivaActiva)
         {
@@ -76,12 +90,43 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // --- NUEVO: FUNCIÓN DE PAUSA ---
+    public void TogglePausa()
+    {
+        if (juegoTerminado) return; // No pausar si ya moriste o ganaste
+
+        juegoPausado = !juegoPausado;
+
+        if (juegoPausado)
+        {
+            Time.timeScale = 0f; // Congela el tiempo (física, animaciones, timers)
+            if (panelPausa) panelPausa.SetActive(true);
+
+            // Liberar mouse para usar el menú
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
+            // Opcional: Pausar música si quieres
+            AudioListener.pause = true;
+        }
+        else
+        {
+            Time.timeScale = 1f; // Tiempo normal
+            if (panelPausa) panelPausa.SetActive(false);
+
+            // Bloquear mouse para seguir jugando
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            AudioListener.pause = false;
+        }
+    }
+
     public void RecibirDano(int cantidad)
     {
         if (juegoTerminado) return;
 
         vidasActuales -= cantidad;
-        Debug.Log($"Vidas restantes: {vidasActuales}");
 
         for (int i = 0; i < corazones.Length; i++)
         {
@@ -90,7 +135,6 @@ public class GameManager : MonoBehaviour
         }
 
         if (vidasActuales <= 0) GameOver();
-        else Debug.Log("Sigues vivo");
     }
 
     public void RecolectarBasura()
@@ -135,13 +179,9 @@ public class GameManager : MonoBehaviour
     {
         zonaYaDesbloqueada = true;
 
-        // --- CAMBIO AQUÍ: QUITAMOS LA PAUSA DEL RELOJ ---
-        // cuentaRegresivaActiva = false; (Línea borrada para que el tiempo siga corriendo)
-
         if (muroBloqueo != null)
         {
-            muroBloqueo.SetActive(false); // Ocultar muro
-
+            muroBloqueo.SetActive(false);
             if (textoMensaje != null)
             {
                 textoMensaje.text = "¡ZONA DESBLOQUEADA!";
@@ -151,9 +191,28 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            // Solo si ganamos el juego completo detenemos el tiempo
             Victoria();
         }
+    }
+
+    public void IniciarModoEscape(float tiempoEscape, Transform nuevoRespawn)
+    {
+        if (muroBloqueo != null) muroBloqueo.SetActive(false);
+
+        muroBloqueo = null;
+        spawnerActual = null;
+        basuraActual = 0;
+        zonaYaDesbloqueada = true;
+
+        if (tiempoEscape > 0)
+        {
+            tiempoInicialDeZona = tiempoEscape;
+            tiempoRestante = tiempoEscape;
+            cuentaRegresivaActiva = true;
+        }
+
+        if (nuevoRespawn != null) puntoRespawnActual = nuevoRespawn;
+        ActualizarUI();
     }
 
     public void RespawnJugador()
@@ -170,7 +229,7 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         juegoTerminado = true;
-        cuentaRegresivaActiva = false; // Aquí SI se detiene
+        cuentaRegresivaActiva = false;
         CongelarJugador();
 
         if (panelGameOver) panelGameOver.SetActive(true);
@@ -180,7 +239,7 @@ public class GameManager : MonoBehaviour
     public void Victoria()
     {
         juegoTerminado = true;
-        cuentaRegresivaActiva = false; // Aquí SI se detiene
+        cuentaRegresivaActiva = false;
         CongelarJugador();
 
         if (panelVictoria) panelVictoria.SetActive(true);
@@ -202,27 +261,30 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void ReiniciarNivel() { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
-    public void SalirAlMenu() { SceneManager.LoadScene(0); }
+    public void ReiniciarNivel()
+    {
+        Time.timeScale = 1f; // IMPORTANTE: Descongelar tiempo antes de recargar
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void SalirAlMenu()
+    {
+        Time.timeScale = 1f; // IMPORTANTE: Descongelar tiempo antes de salir
+        SceneManager.LoadScene(0); // Carga la Escena 0 (Menú Principal)
+    }
+
     void BorrarMensaje() { if (textoMensaje != null) textoMensaje.text = ""; }
     void ActualizarUI() { if (textoScore != null) textoScore.text = $"Basura: {basuraActual} / {basuraObjetivo}"; }
 
     public void ReiniciarDesdeCheckpoint()
     {
-        Debug.Log("Reviviendo...");
-
         juegoTerminado = false;
         vidasActuales = vidasMaximas;
         basuraActual = 0;
-
         if (textoMensaje != null) textoMensaje.text = "";
-
         ActualizarUI();
 
-        if (spawnerActual != null)
-        {
-            spawnerActual.ResetearSistema();
-        }
+        if (spawnerActual != null) spawnerActual.ResetearSistema();
 
         if (muroBloqueo != null)
         {
@@ -247,12 +309,9 @@ public class GameManager : MonoBehaviour
 
         if (jugador != null)
         {
-            var movimiento = jugador.GetComponent<MovimientoSimple>();
-            if (movimiento != null) movimiento.enabled = true;
-            var pasos = jugador.GetComponent<SistemaPasos>();
-            if (pasos != null) pasos.enabled = true;
-            var interaccion = jugador.GetComponent<InteraccionJugador>();
-            if (interaccion != null) interaccion.enabled = true;
+            jugador.GetComponent<MovimientoSimple>().enabled = true;
+            jugador.GetComponent<SistemaPasos>().enabled = true;
+            jugador.GetComponent<InteraccionJugador>().enabled = true;
         }
 
         ActualizarCorazonesUI();
@@ -261,49 +320,6 @@ public class GameManager : MonoBehaviour
 
     void ActualizarCorazonesUI()
     {
-        for (int i = 0; i < corazones.Length; i++)
-        {
-            corazones[i].SetActive(true);
-        }
-    }
-
-    public void IniciarModoEscape(float tiempoEscape, Transform nuevoRespawn)
-    {
-        Debug.Log("¡MODO ESCAPE ACTIVADO!");
-
-        // 1. Limpiar rastro del nivel anterior
-        // Si había un muro activo, lo apagamos para que no estorbe al regresar
-        if (muroBloqueo != null)
-        {
-            muroBloqueo.SetActive(false);
-        }
-
-        // Vaciamos las variables para que al morir NO intente poner muro ni basura
-        muroBloqueo = null;
-        spawnerActual = null;
-
-        basuraActual = 0;
-        basuraObjetivo = 0; // Ya no hay que juntar nada
-        zonaYaDesbloqueada = true; // Para que no intente desbloquear nada
-
-        // 2. Configurar el Nuevo Tiempo
-        if (tiempoEscape > 0)
-        {
-            tiempoInicialDeZona = tiempoEscape; // Guardamos el tiempo de escape (ej. 120s)
-            tiempoRestante = tiempoEscape;
-            cuentaRegresivaActiva = true;
-        }
-        else
-        {
-            cuentaRegresivaActiva = false;
-        }
-
-        // 3. Actualizar Respawn
-        if (nuevoRespawn != null)
-        {
-            puntoRespawnActual = nuevoRespawn;
-        }
-
-        ActualizarUI();
+        for (int i = 0; i < corazones.Length; i++) corazones[i].SetActive(true);
     }
 }
